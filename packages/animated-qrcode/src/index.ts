@@ -63,11 +63,15 @@ export class AnimatedQRCodeDecoder {
     } else {
       let newList = [...this.fragments, fragment];
       for (let i = 0; i < newList.length - 1; i++) {
-        if (fragment.index < newList[i].index) {
+        if (fragment.index === newList[i].index) {
+          // received the same fragment
+          newList = this.fragments;
+          break;
+        } else if (fragment.index < newList[i].index) {
           newList = [
             ...newList.slice(0, i),
             fragment,
-            ...newList.slice(i, newList.length - 1),
+            ...newList.slice(i, newList.length - 2),
           ];
           break;
         }
