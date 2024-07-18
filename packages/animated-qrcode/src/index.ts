@@ -86,4 +86,15 @@ export class AnimatedQRCodeDecoder {
       this.result = Buffer.concat(this.fragments.map((f) => f.data));
     }
   }
+
+  public reset(): void {
+    this.finished = false;
+    this.result = null;
+    this.fragments = [];
+    this.count = 0;
+  }
+
+  public getProgress(): number {
+    return this.fragments.length / this.count;
+  }
 }

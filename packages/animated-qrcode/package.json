@@ -1,6 +1,6 @@
 {
   "name": "@doomjs/animated-qrcode",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Encode and decode animated QR code data",
   "keywords": [
     "qrcode"
