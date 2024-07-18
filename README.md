@@ -1,2 +1,5 @@
 # doom-js-libs
-This monorepo is a collection of packages
+
+This repo is a collection of packages
+
+# modules
