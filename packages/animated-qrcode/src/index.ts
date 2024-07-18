@@ -22,7 +22,8 @@ export type Fragment = {
 function decodeFragment(data: string): Fragment {
   // get index and count
   const [_, __, indexString, base64Data] = data.split("|");
-  const [index, count] = indexString.split("/").map(parseInt);
+  const index = parseInt(indexString.split("/")[0]);
+  const count = parseInt(indexString.split("/")[1]);
   if (index < 0 || index >= count) {
     throw new Error("Invalid Doom Animated QR Code");
   }
