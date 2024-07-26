@@ -1,16 +1,48 @@
 // Doom Animated QR Code data format: DOOM|AQR|fragmentIndex/fragmentsCount|base64Data
 
+// If the fragment size is less than minFragementSize, it will have only one fragment.
 export function encode(
   data: string | Buffer | Uint8Array,
-  fragementSize: number = 500
+  maxFragementSize: number = 400,
+  minFragementSize: number = 40
 ): string[] {
   const base64Data = Buffer.from(data).toString("base64");
-  const fragmentsCount = Math.ceil(base64Data.length / fragementSize);
-  return Array.from({ length: fragmentsCount }, (_, index) => {
-    const start = index * fragementSize;
-    const end = start + fragementSize;
-    return `DOOM|AQR|${index}/${fragmentsCount}|base64Data.slice(start, end)`;
-  });
+  const fragmentsCount = Math.ceil(base64Data.length / maxFragementSize);
+  if (fragmentsCount === 1) {
+    return [`DOOM|AQR|0/1|${base64Data}`];
+  }
+  const fragments: string[] = [];
+  for (let index = 0; index < fragmentsCount - 1; index++) {
+    const start = index * maxFragementSize;
+    const end = start + maxFragementSize;
+    fragments.push(
+      `DOOM|AQR|${index}/${fragmentsCount}|${base64Data.slice(start, end)}`
+    );
+  }
+  // handle the last two fragments
+  let secondToLastFragmentSize = maxFragementSize;
+  let lastFragmentSize = base64Data.length % maxFragementSize;
+  if (lastFragmentSize < minFragementSize) {
+    secondToLastFragmentSize = (maxFragementSize + lastFragmentSize) / 2;
+    lastFragmentSize =
+      maxFragementSize + lastFragmentSize - secondToLastFragmentSize;
+  }
+  const secondTolastFragmentStart = (fragmentsCount - 2) * maxFragementSize;
+  const lastFragmentStart =
+    secondTolastFragmentStart + secondToLastFragmentSize;
+  fragments.push(
+    `DOOM|AQR|${fragmentsCount - 2}/${fragmentsCount}|${base64Data.slice(
+      secondTolastFragmentStart,
+      lastFragmentStart
+    )}`
+  );
+  fragments.push(
+    `DOOM|AQR|${fragmentsCount - 1}/${fragmentsCount}|${base64Data.slice(
+      lastFragmentStart,
+      lastFragmentStart + lastFragmentSize
+    )}`
+  );
+  return fragments;
 }
 
 export type Fragment = {
