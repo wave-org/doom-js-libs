@@ -12,7 +12,7 @@ export function encode(
     return [`DOOM|AQR|0/1|${base64Data}`];
   }
   const fragments: string[] = [];
-  for (let index = 0; index < fragmentsCount - 1; index++) {
+  for (let index = 0; index < fragmentsCount - 2; index++) {
     const start = index * maxFragementSize;
     const end = start + maxFragementSize;
     fragments.push(
@@ -48,7 +48,7 @@ export function encode(
 export type Fragment = {
   index: number;
   count: number;
-  data: Buffer;
+  base64Data: string;
 };
 
 function decodeFragment(data: string): Fragment {
@@ -59,9 +59,7 @@ function decodeFragment(data: string): Fragment {
   if (index < 0 || index >= count) {
     throw new Error("Invalid Doom Animated QR Code");
   }
-  // decode base64 data
-  const buffer = Buffer.from(base64Data, "base64");
-  return { index, count, data: buffer };
+  return { index, count, base64Data };
 }
 
 export function isAQR(data: string): boolean {
@@ -120,7 +118,7 @@ export class AnimatedQRCodeDecoder {
         }
       }
       this.finished = true;
-      this.result = Buffer.concat(this.fragments.map((f) => f.data));
+      this.result = Buffer.from(this.fragments.map((fragment) => fragment.base64Data).join(""), "base64");
     }
   }
 
