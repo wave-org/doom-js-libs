@@ -11,22 +11,23 @@ export type InputData = {
 
 export type Function = {
   name: string;
-  // minimal format of function as key
-  miniFormat: string;
   inputData: InputData[];
+  // minimal format of function as key
+  signature: string;
 };
 
-export type MiniFormatFunction = string;
+// minimal format of function
+export type FunctionSignature = string;
 
 export type InputDataType = string | string[];
 
 export type FunctionHeader = {
-  signature: string;
-  miniFormat: MiniFormatFunction;
+  selector: string;
+  signature: FunctionSignature;
 };
 
 export type FunctionData = {
-  miniFormat: MiniFormatFunction;
+  signature: FunctionSignature;
   data: string;
 };
 
@@ -34,17 +35,17 @@ export interface ABIDatabase {
   loadAllFunctionHeaders(): Promise<FunctionHeader[]>;
   saveFunctionHeaders(headers: FunctionHeader[]): Promise<void>;
   saveFunctionData(data: FunctionData[]): Promise<void>;
-  getFunctionData(miniFormat: MiniFormatFunction): Promise<string | null>;
+  getFunctionData(signature: FunctionSignature): Promise<string | null>;
   reomveAllData(): Promise<void>;
 }
 
 export class EVMInputDataDecoder {
-  // value is a list of minimum format of function
-  private signatureMap: Map<string, MiniFormatFunction[]> = new Map();
+  // value is a list of minimum format of function, key is the function selector
+  private signatureMap: Map<string, FunctionSignature[]> = new Map();
   // use minimal format of function as key to check if this type of function is already loaded
-  private functionKeyMap: Map<MiniFormatFunction, boolean> = new Map();
+  private loadedSignature: Map<FunctionSignature, boolean> = new Map();
   // cache function fragments for loaded functions
-  private functionsCache: Map<MiniFormatFunction, FunctionFragment> = new Map();
+  private functionsCache: Map<FunctionSignature, FunctionFragment> = new Map();
   public database: ABIDatabase | null; // TODO
 
   constructor(database: ABIDatabase | null = null) {
@@ -66,22 +67,22 @@ export class EVMInputDataDecoder {
       const abi = abiList[i];
       const contract = new Interface(abi);
       contract.forEachFunction((fragment) => {
-        const miniFormat = fragment.format("minimal");
-        if (this.functionKeyExists(miniFormat)) {
+        const signature = fragment.format("minimal");
+        if (this.signatureExists(signature)) {
           return;
         }
-        const sig = fragment.selector;
-        let list = this.signatureMap.get(sig);
+        const selector = fragment.selector;
+        let list = this.signatureMap.get(selector);
         if (list === undefined) {
           list = [];
         }
-        list.push(miniFormat);
-        this.signatureMap.set(sig, list);
+        list.push(signature);
+        this.signatureMap.set(selector, list);
 
-        this.functionsCache.set(miniFormat, fragment);
+        this.functionsCache.set(signature, fragment);
       });
     }
-    this.bundledFunctionCount = this.functionKeyMap.size;
+    this.bundledFunctionCount = this.loadedSignature.size;
   }
 
   public async loadABIFromDatabase() {
@@ -89,15 +90,15 @@ export class EVMInputDataDecoder {
       const list = await this.database.loadAllFunctionHeaders();
       for (let i = 0; i < list.length; i++) {
         const header = list[i];
-        if (this.functionKeyExists(header.miniFormat)) {
+        if (this.signatureExists(header.signature)) {
           return;
         }
-        let miniFormats = this.signatureMap.get(header.signature);
-        if (miniFormats === undefined) {
-          miniFormats = [];
+        let signatures = this.signatureMap.get(header.signature);
+        if (signatures === undefined) {
+          signatures = [];
         }
-        miniFormats.push(header.miniFormat);
-        this.signatureMap.set(header.signature, miniFormats);
+        signatures.push(header.signature);
+        this.signatureMap.set(header.signature, signatures);
       }
     }
   }
@@ -107,25 +108,26 @@ export class EVMInputDataDecoder {
     const headers: FunctionHeader[] = [];
     const data: FunctionData[] = [];
     contract.forEachFunction((fragment) => {
-      const miniFormat = fragment.format("minimal");
-      if (this.functionKeyExists(miniFormat)) {
+      const signature = fragment.format("minimal");
+      if (this.signatureExists(signature)) {
         return;
       }
-      const sig = fragment.selector;
-      let list = this.signatureMap.get(sig);
+      const selector = fragment.selector;
+      let list = this.signatureMap.get(selector);
       if (list === undefined) {
         list = [];
       }
-      list.push(miniFormat);
-      this.signatureMap.set(sig, list);
-      this.functionsCache.set(miniFormat, fragment);
+      list.push(signature);
+      this.signatureMap.set(selector, list);
+      this.functionsCache.set(signature, fragment);
 
       headers.push({
-        signature: sig,
-        miniFormat,
+        signature,
+        selector,
       });
+
       data.push({
-        miniFormat,
+        signature,
         data: fragment.format("json"),
       });
     });
@@ -135,11 +137,11 @@ export class EVMInputDataDecoder {
     }
   }
 
-  private functionKeyExists(miniFormat: MiniFormatFunction) {
-    if (this.functionKeyMap.get(miniFormat) === true) {
+  private signatureExists(signature: FunctionSignature) {
+    if (this.loadedSignature.get(signature) === true) {
       return true;
     }
-    this.functionKeyMap.set(miniFormat, true);
+    this.loadedSignature.set(signature, true);
     return false;
   }
 
@@ -154,30 +156,30 @@ export class EVMInputDataDecoder {
     if (inputData.length < 10) {
       throw new Error("Invalid input data");
     }
-    const signature = inputData.slice(0, 10).toLowerCase();
+    const selector = inputData.slice(0, 10).toLowerCase();
     // try to match the signature
-    const miniFormats = this.signatureMap.get(signature);
-    if (miniFormats === undefined || miniFormats.length === 0) {
-      console.log("signature not found: " + signature);
+    const signatures = this.signatureMap.get(selector);
+    if (signatures === undefined || signatures.length === 0) {
+      console.log("signature not found: " + selector);
       return [];
     }
 
     let functions: Function[] = [];
-    for (let miniFormat of miniFormats) {
-      let fragment = this.functionsCache.get(miniFormat);
+    for (let signature of signatures) {
+      let fragment = this.functionsCache.get(signature);
       if (fragment === undefined) {
         if (this.database === null) {
           throw new Error("Database not found");
         }
-        const data = await this.database!.getFunctionData(miniFormat);
+        const data = await this.database!.getFunctionData(signature);
         if (data === null) {
           throw new Error("Function data not found in database");
         }
-        fragment = FunctionFragment.from(data);
+        fragment = FunctionFragment.from(JSON.parse(data));
         if (fragment === null) {
           throw new Error("Failed to parse function data");
         }
-        this.functionsCache.set(miniFormat, fragment);
+        this.functionsCache.set(signature, fragment);
       }
 
       let types = fragment.inputs.map((x) => x.type);
@@ -211,9 +213,9 @@ export class EVMInputDataDecoder {
         }
       });
       functions.push({
-        miniFormat: miniFormat,
         name: fragment.name,
         inputData: result,
+        signature: signature,
       });
     }
 
@@ -222,11 +224,11 @@ export class EVMInputDataDecoder {
 
   private bundledFunctionCount = 0;
   public functionCount(): number {
-    return this.functionKeyMap.size;
+    return this.loadedSignature.size;
   }
 
   public importedFunctionCount(): number {
-    return this.functionKeyMap.size - this.bundledFunctionCount;
+    return this.loadedSignature.size - this.bundledFunctionCount;
   }
 }
 

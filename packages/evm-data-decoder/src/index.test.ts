@@ -1,4 +1,4 @@
-import { EVMInputDataDecoder } from "../src";
+import { EVMInputDataDecoder } from ".";
 
 describe("EVMInputDataDecoder", function () {
   it("decode AAVE.supply", async function () {
@@ -10,7 +10,7 @@ describe("EVMInputDataDecoder", function () {
     );
     expect(result).not.toBe([]);
     expect(JSON.stringify(result)).toBe(
-      `[{"miniFormat\":\"function supply(address,uint256,address,uint16)\",\"name\":"supply","inputData":[{"name":"asset","type":"address","value":"0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"},{"name":"amount","type":"uint256","value":"318767581"},{"name":"onBehalfOf","type":"address","value":"0x778F5d8dF43f7415420d9f935B8630C86125BfFA"},{"name":"referralCode","type":"uint16","value":"0"}]}]`
+      '[{"name":"supply","inputData":[{"name":"asset","type":"address","value":"0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"},{"name":"amount","type":"uint256","value":"318767581"},{"name":"onBehalfOf","type":"address","value":"0x778F5d8dF43f7415420d9f935B8630C86125BfFA"},{"name":"referralCode","type":"uint16","value":"0"}],"signature":"function supply(address,uint256,address,uint16)"}]'
     );
   });
 
@@ -23,7 +23,7 @@ describe("EVMInputDataDecoder", function () {
     );
     expect(result).not.toBe([]);
     expect(JSON.stringify(result)).toBe(
-      `[{"miniFormat\":\"function swap(address,(address,address,address,address,uint256,uint256,uint256),bytes) payable returns (uint256,uint256)\",\"name\":"swap","inputData":[{"name":"executor","type":"address","value":"0xE37e799D5077682FA0a244D46E5649F71457BD09"},{"name":"desc","type":"tuple","value":[{"name":"srcToken","type":"address","value":"0xdAC17F958D2ee523a2206206994597C13D831ec7"},{"name":"dstToken","type":"address","value":"0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"},{"name":"srcReceiver","type":"address","value":"0xE37e799D5077682FA0a244D46E5649F71457BD09"},{"name":"dstReceiver","type":"address","value":"0x778F5d8dF43f7415420d9f935B8630C86125BfFA"},{"name":"amount","type":"uint256","value":"200000000000"},{"name":"minReturnAmount","type":"uint256","value":"318767580"},{"name":"flags","type":"uint256","value":"0"}]},{"name":"data","type":"bytes","value":"0x0000000000000000000000000000000000000000000000ab00007d00004f02a00000000000000000000000000000000000000000000000000000000012d1a6eaee63c1e5009db9e0e53058c89e5b94e29621a205198648425bdac17f958d2ee523a2206206994597c13d831ec780a06c4eca272260fac5e5542a773aa44fbcfedf7c193bc2c599111111125421ca6dc452d289314280a0f8842a650020d6bdbf782260fac5e5542a773aa44fbcfedf7c193bc2c599111111125421ca6dc452d289314280a0f8842a65"}]}]`
+      '[{"name":"swap","inputData":[{"name":"executor","type":"address","value":"0xE37e799D5077682FA0a244D46E5649F71457BD09"},{"name":"desc","type":"tuple","value":[{"name":"srcToken","type":"address","value":"0xdAC17F958D2ee523a2206206994597C13D831ec7"},{"name":"dstToken","type":"address","value":"0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"},{"name":"srcReceiver","type":"address","value":"0xE37e799D5077682FA0a244D46E5649F71457BD09"},{"name":"dstReceiver","type":"address","value":"0x778F5d8dF43f7415420d9f935B8630C86125BfFA"},{"name":"amount","type":"uint256","value":"200000000000"},{"name":"minReturnAmount","type":"uint256","value":"318767580"},{"name":"flags","type":"uint256","value":"0"}]},{"name":"data","type":"bytes","value":"0x0000000000000000000000000000000000000000000000ab00007d00004f02a00000000000000000000000000000000000000000000000000000000012d1a6eaee63c1e5009db9e0e53058c89e5b94e29621a205198648425bdac17f958d2ee523a2206206994597c13d831ec780a06c4eca272260fac5e5542a773aa44fbcfedf7c193bc2c599111111125421ca6dc452d289314280a0f8842a650020d6bdbf782260fac5e5542a773aa44fbcfedf7c193bc2c599111111125421ca6dc452d289314280a0f8842a65"}],"signature":"function swap(address,(address,address,address,address,uint256,uint256,uint256),bytes) payable returns (uint256,uint256)"}]'
     );
   });
 
@@ -36,7 +36,7 @@ describe("EVMInputDataDecoder", function () {
     );
     expect(result).not.toBe([]);
     expect(JSON.stringify(result)).toBe(
-      `[{"miniFormat\":\"function execute(bytes,bytes[],uint256) payable\",\"name\":"execute","inputData":[{"name":"commands","type":"bytes","value":"0x0b080604"},{"name":"inputs","type":"bytes[]","value":[{"name":"inputs[0]","type":"bytes","value":"0x000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000006f05b59d3b20000"},{"name":"inputs[1]","type":"bytes","value":"0x000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000006f05b59d3b200000000000000000000000000000000000000000000000000000017ddf5768596e700000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000000678431b4697eaf68fe8d5ab62cd4c9c1c2e97c2"},{"name":"inputs[2]","type":"bytes","value":"0x0000000000000000000000000678431b4697eaf68fe8d5ab62cd4c9c1c2e97c200000000000000000000000037a8f295612602f2774d331e562be9e61b83a3270000000000000000000000000000000000000000000000000000000000000019"},{"name":"inputs[3]","type":"bytes","value":"0x0000000000000000000000000678431b4697eaf68fe8d5ab62cd4c9c1c2e97c200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000017ceaf16dd9352"}]},{"name":"deadline","type":"uint256","value":"1714016111"}]}]`
+      '[{"name":"execute","inputData":[{"name":"commands","type":"bytes","value":"0x0b080604"},{"name":"inputs","type":"bytes[]","value":[{"name":"inputs[0]","type":"bytes","value":"0x000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000006f05b59d3b20000"},{"name":"inputs[1]","type":"bytes","value":"0x000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000006f05b59d3b200000000000000000000000000000000000000000000000000000017ddf5768596e700000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000000678431b4697eaf68fe8d5ab62cd4c9c1c2e97c2"},{"name":"inputs[2]","type":"bytes","value":"0x0000000000000000000000000678431b4697eaf68fe8d5ab62cd4c9c1c2e97c200000000000000000000000037a8f295612602f2774d331e562be9e61b83a3270000000000000000000000000000000000000000000000000000000000000019"},{"name":"inputs[3]","type":"bytes","value":"0x0000000000000000000000000678431b4697eaf68fe8d5ab62cd4c9c1c2e97c200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000017ceaf16dd9352"}]},{"name":"deadline","type":"uint256","value":"1714016111"}],"signature":"function execute(bytes,bytes[],uint256) payable"}]'
     );
   });
 
@@ -49,7 +49,7 @@ describe("EVMInputDataDecoder", function () {
     );
     expect(result).not.toBe([]);
     expect(JSON.stringify(result)).toBe(
-      `[{"miniFormat\":\"function swapExactTokensForTokensSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)\",\"name\":"swapExactTokensForTokensSupportingFeeOnTransferTokens","inputData":[{"name":"amountIn","type":"uint256","value":"876027044069999"},{"name":"amountOutMin","type":"uint256","value":"460763388716851493"},{"name":"path","type":"address[]","value":[{"name":"path[0]","type":"address","value":"0xa41d2f8Ee4F47D3B860A149765A7dF8c3287b7F0"},{"name":"path[1]","type":"address","value":"0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"}]},{"name":"to","type":"address","value":"0xb1b2d032AA2F52347fbcfd08E5C3Cc55216E8404"},{"name":"deadline","type":"uint256","value":"1714015756"}]}]`
+      '[{"name":"swapExactTokensForTokensSupportingFeeOnTransferTokens","inputData":[{"name":"amountIn","type":"uint256","value":"876027044069999"},{"name":"amountOutMin","type":"uint256","value":"460763388716851493"},{"name":"path","type":"address[]","value":[{"name":"path[0]","type":"address","value":"0xa41d2f8Ee4F47D3B860A149765A7dF8c3287b7F0"},{"name":"path[1]","type":"address","value":"0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"}]},{"name":"to","type":"address","value":"0xb1b2d032AA2F52347fbcfd08E5C3Cc55216E8404"},{"name":"deadline","type":"uint256","value":"1714015756"}],"signature":"function swapExactTokensForTokensSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)"}]'
     );
   });
   it("import ABI and decode string", async function () {
@@ -64,7 +64,7 @@ describe("EVMInputDataDecoder", function () {
     );
     expect(result).not.toBe([]);
     expect(JSON.stringify(result)).toBe(
-      `[{"miniFormat\":\"function registerOffChainDonation(address,uint256,uint256,string,bytes32)\",\"name\":"registerOffChainDonation","inputData":[{"name":"addr","type":"address","value":"0x5A9dAC9315FdD1c3D13eF8Af7FDFEB522Db08F02"},{"name":"timestamp","type":"uint256","value":"1487012400"},{"name":"chfCents","type":"uint256","value":"4204852"},{"name":"currency","type":"string","value":"BTC"},{"name":"memo","type":"bytes32","value":"0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8"}]}]`
+      '[{"name":"registerOffChainDonation","inputData":[{"name":"addr","type":"address","value":"0x5A9dAC9315FdD1c3D13eF8Af7FDFEB522Db08F02"},{"name":"timestamp","type":"uint256","value":"1487012400"},{"name":"chfCents","type":"uint256","value":"4204852"},{"name":"currency","type":"string","value":"BTC"},{"name":"memo","type":"bytes32","value":"0xf3df64775a2dfb6bc9e09dced96d0816ff5055bf95da13ce5b6c3f53b97071c8"}],"signature":"function registerOffChainDonation(address,uint256,uint256,string,bytes32)"}]'
     );
   });
   it("import ABI and decode tuple[]", async function () {
@@ -80,7 +80,7 @@ describe("EVMInputDataDecoder", function () {
     );
     expect(result).not.toBe([]);
     expect(JSON.stringify(result)).toBe(
-      `[{"miniFormat\":\"function createTwoProposals((string,uint256)[2])\",\"name\":"createTwoProposals","inputData":[{"name":"pps","type":"tuple[2]","value":[{"name":"pps[0]","type":"tuple","value":[{"name":"name","type":"string","value":"1"},{"name":"voteCount","type":"uint256","value":"1"}]},{"name":"pps[1]","type":"tuple","value":[{"name":"name","type":"string","value":"2"},{"name":"voteCount","type":"uint256","value":"2"}]}]}]}]`
+      '[{"name":"createTwoProposals","inputData":[{"name":"pps","type":"tuple[2]","value":[{"name":"pps[0]","type":"tuple","value":[{"name":"name","type":"string","value":"1"},{"name":"voteCount","type":"uint256","value":"1"}]},{"name":"pps[1]","type":"tuple","value":[{"name":"name","type":"string","value":"2"},{"name":"voteCount","type":"uint256","value":"2"}]}]}],"signature":"function createTwoProposals((string,uint256)[2])"}]'
     );
   });
 });
