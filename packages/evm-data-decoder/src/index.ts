@@ -3,7 +3,7 @@ import { FunctionFragment, Interface, ParamType, Result } from "ethers";
 import abiList from "./abi";
 
 export type InputData = {
-  // Items in array don't have names
+  // The name of the parameter is not always correct, it is just a hint
   name: string;
   type: string;
   value: string | InputData[];
@@ -16,7 +16,8 @@ export type Function = {
   signature: string;
 };
 
-// minimal format of function
+// minimal format of function, we use it as key to check if this type of function is already loaded
+// howerver, the parameter names are not included in this format, so the decoded result may not have correct parameter names
 export type FunctionSignature = string;
 
 export type InputDataType = string | string[];
@@ -98,7 +99,7 @@ export class EVMInputDataDecoder {
           signatures = [];
         }
         signatures.push(header.signature);
-        this.signatureMap.set(header.signature, signatures);
+        this.signatureMap.set(header.selector, signatures);
       }
     }
   }
@@ -160,7 +161,7 @@ export class EVMInputDataDecoder {
     // try to match the signature
     const signatures = this.signatureMap.get(selector);
     if (signatures === undefined || signatures.length === 0) {
-      console.log("signature not found: " + selector);
+      // console.log("signature not found: " + selector);
       return [];
     }
 
@@ -229,6 +230,16 @@ export class EVMInputDataDecoder {
 
   public importedFunctionCount(): number {
     return this.loadedSignature.size - this.bundledFunctionCount;
+  }
+
+  public async reomveAllData() {
+    if (this.database !== null) {
+      await this.database.reomveAllData();
+      this.signatureMap.clear();
+      this.loadedSignature.clear();
+      this.functionsCache.clear();
+      this.loadBundledABI();
+    }
   }
 }
 
