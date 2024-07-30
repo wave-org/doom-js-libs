@@ -20,10 +20,12 @@ export type Function = {
 // howerver, the parameter names are not included in this format, so the decoded result may not have correct parameter names
 export type FunctionSignature = string;
 
+export type FunctionSelector = string;
+
 export type InputDataType = string | string[];
 
 export type FunctionHeader = {
-  selector: string;
+  selector: FunctionSelector;
   signature: FunctionSignature;
 };
 
@@ -42,7 +44,7 @@ export interface ABIDatabase {
 
 export class EVMInputDataDecoder {
   // value is a list of minimum format of function, key is the function selector
-  private signatureMap: Map<string, FunctionSignature[]> = new Map();
+  private signatureMap: Map<FunctionSelector, FunctionSignature[]> = new Map();
   // use minimal format of function as key to check if this type of function is already loaded
   private loadedSignature: Map<FunctionSignature, boolean> = new Map();
   // cache function fragments for loaded functions
@@ -94,7 +96,7 @@ export class EVMInputDataDecoder {
         if (this.signatureExists(header.signature)) {
           return;
         }
-        let signatures = this.signatureMap.get(header.signature);
+        let signatures = this.signatureMap.get(header.selector);
         if (signatures === undefined) {
           signatures = [];
         }
