@@ -4,7 +4,7 @@
 export function encode(
   data: string | Buffer | Uint8Array,
   maxFragementSize: number = 400,
-  minFragementSize: number = 40
+  minFragementSize: number = 40,
 ): string[] {
   const base64Data = Buffer.from(data).toString("base64");
   const fragmentsCount = Math.ceil(base64Data.length / maxFragementSize);
@@ -16,7 +16,7 @@ export function encode(
     const start = index * maxFragementSize;
     const end = start + maxFragementSize;
     fragments.push(
-      `DOOM|AQR|${index}/${fragmentsCount}|${base64Data.slice(start, end)}`
+      `DOOM|AQR|${index}/${fragmentsCount}|${base64Data.slice(start, end)}`,
     );
   }
   // handle the last two fragments
@@ -33,14 +33,14 @@ export function encode(
   fragments.push(
     `DOOM|AQR|${fragmentsCount - 2}/${fragmentsCount}|${base64Data.slice(
       secondTolastFragmentStart,
-      lastFragmentStart
-    )}`
+      lastFragmentStart,
+    )}`,
   );
   fragments.push(
     `DOOM|AQR|${fragmentsCount - 1}/${fragmentsCount}|${base64Data.slice(
       lastFragmentStart,
-      lastFragmentStart + lastFragmentSize
-    )}`
+      lastFragmentStart + lastFragmentSize,
+    )}`,
   );
   return fragments;
 }
@@ -92,22 +92,15 @@ export class AnimatedQRCodeDecoder {
     } else if (this.fragments.length >= this.count) {
       throw new Error("Invalid Doom Animated QR Code");
     } else {
-      let newList = [...this.fragments, fragment];
-      for (let i = 0; i < newList.length - 1; i++) {
-        if (fragment.index === newList[i].index) {
-          // received the same fragment
-          newList = this.fragments;
-          break;
-        } else if (fragment.index < newList[i].index) {
-          newList = [
-            ...newList.slice(0, i),
-            fragment,
-            ...newList.slice(i, newList.length - 2),
-          ];
+      for (let i = 0; i < this.fragments.length - 1; i++) {
+        if (fragment.index < this.fragments[i].index) {
+          this.fragments.splice(i, 0, fragment);
           break;
         }
       }
-      this.fragments = newList;
+      if (this.fragments[this.fragments.length - 1].index < fragment.index) {
+        this.fragments.push(fragment);
+      }
     }
 
     if (this.fragments.length === this.count) {
@@ -118,7 +111,10 @@ export class AnimatedQRCodeDecoder {
         }
       }
       this.finished = true;
-      this.result = Buffer.from(this.fragments.map((fragment) => fragment.base64Data).join(""), "base64");
+      this.result = Buffer.from(
+        this.fragments.map((fragment) => fragment.base64Data).join(""),
+        "base64",
+      );
     }
   }
 
