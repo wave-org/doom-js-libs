@@ -92,7 +92,7 @@ export class AnimatedQRCodeDecoder {
     } else if (this.fragments.length >= this.count) {
       throw new Error("Invalid Doom Animated QR Code");
     } else {
-      for (let i = 0; i < this.fragments.length - 1; i++) {
+      for (let i = 0; i < this.fragments.length; i++) {
         if (fragment.index < this.fragments[i].index) {
           this.fragments.splice(i, 0, fragment);
           break;
